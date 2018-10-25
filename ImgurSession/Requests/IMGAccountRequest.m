@@ -152,7 +152,7 @@
 
 #pragma mark - Update account settings
 
-+ (void)changeAccountWithBio:(NSString*)bio success:(void (^)())success failure:(void (^)(NSError *error))failure{
++ (void)changeAccountWithBio:(NSString*)bio success:(void (^)(void))success failure:(void (^)(NSError *error))failure{
     //only allows settings for current account after login
     NSString *path = [self pathWithID:@"me" withOption:@"settings"];
     
@@ -173,7 +173,7 @@
     } failure:failure];
 }
 
-+ (void)changeAccountWithBio:(NSString*)bio messagingEnabled:(BOOL)msgEnabled publicImages:(BOOL)publicImages albumPrivacy:(IMGAlbumPrivacy)privacy acceptedGalleryTerms:(BOOL)galTerms success:(void (^)())success failure:(void (^)(NSError *error))failure{
++ (void)changeAccountWithBio:(NSString*)bio messagingEnabled:(BOOL)msgEnabled publicImages:(BOOL)publicImages albumPrivacy:(IMGAlbumPrivacy)privacy acceptedGalleryTerms:(BOOL)galTerms success:(void (^)(void))success failure:(void (^)(NSError *error))failure{
     //only allows settings for current account after login
     NSString *path = [self pathWithID:@"me" withOption:@"settings"];
     
@@ -220,7 +220,7 @@
 
 #pragma mark - Verify User Email
 
-+(void)sendUserEmailVerification:(void (^)())success failure:(void (^)(NSError * error))failure{
++(void)sendUserEmailVerification:(void (^)(void))success failure:(void (^)(NSError * error))failure{
     
     NSString *path = [self pathWithID:@"me" withOption:@"verifyemail"];
     
@@ -310,7 +310,7 @@
     
 }
 
-+ (void)accountDeleteAlbumWithID:(NSString*)albumID success:(void (^)())success failure:(void (^)(NSError *))failure{
++ (void)accountDeleteAlbumWithID:(NSString*)albumID success:(void (^)(void))success failure:(void (^)(NSError *))failure{
     
     NSString *path = [self pathWithID:@"me" withOption:@"albums" withID2:albumID];
     
@@ -386,7 +386,7 @@
     } failure:failure];
 }
 
-+ (void)accountDeleteImageWithUser:(NSString*)username deletehash:(NSString*)deleteHash success:(void (^)())success failure:(void (^)(NSError *))failure{
++ (void)accountDeleteImageWithUser:(NSString*)username deletehash:(NSString*)deleteHash success:(void (^)(void))success failure:(void (^)(NSError *))failure{
 
     NSString *path = [self pathWithID:username withOption:@"image" withID2:deleteHash];
     
@@ -461,7 +461,7 @@
     } failure:failure];
 }
 
-+ (void)accountDeleteCommentWithID:(NSInteger)commentID success:(void (^)())success failure:(void (^)(NSError *))failure{
++ (void)accountDeleteCommentWithID:(NSInteger)commentID success:(void (^)(void))success failure:(void (^)(NSError *))failure{
     
     NSString *path = [self pathWithID:@"me" withOption:@"comment" withID2:[NSString stringWithFormat:@"%lu", (unsigned long)commentID]];
     

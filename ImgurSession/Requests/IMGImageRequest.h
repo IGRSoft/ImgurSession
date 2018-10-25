@@ -102,17 +102,17 @@
 /**
  Delete an image with an image ID if you are the owner of the image. Must be logged in.
  */
-+ (void)deleteImageWithID:(NSString *)imageID success:(void (^)())success failure:(void (^)(NSError *error))failure;
++ (void)deleteImageWithID:(NSString *)imageID success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
 /**
  Delete an image with an anonymous deletehash
  */
-+ (void)deleteImageWithHash:(NSString *)deletehash success:(void (^)())success failure:(void (^)(NSError * error))failure;
++ (void)deleteImageWithHash:(NSString *)deletehash success:(void (^)(void))success failure:(void (^)(NSError * error))failure;
 
 #pragma mark - Favourtie
 /**
  Fav an album. Must be signed in.
  */
-+(void)favouriteImageWithID:(NSString*)imageID  success:(void (^)())success failure:(void (^)(NSError *error))failure;
++(void)favouriteImageWithID:(NSString*)imageID  success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
 
 
 #pragma mark - Update
@@ -120,9 +120,9 @@
 /**
  Change image title or description or both. Must be logged In.
  */
-+ (void)updateImageWithID:(NSString *)imageID title:(NSString*)title description:(NSString*)description success:(void (^)())success failure:(void (^)(NSError * error))failure;
++ (void)updateImageWithID:(NSString *)imageID title:(NSString*)title description:(NSString*)description success:(void (^)(void))success failure:(void (^)(NSError * error))failure;
 /**
  Anonymously change title or description with deletehash
  */
-+ (void)updateImageWithDeleteHash:(NSString *)deletehash title:(NSString*)title description:(NSString*)description success:(void (^)())success failure:(void (^)(NSError * error))failure;
++ (void)updateImageWithDeleteHash:(NSString *)deletehash title:(NSString*)title description:(NSString*)description success:(void (^)(void))success failure:(void (^)(NSError * error))failure;
 @end

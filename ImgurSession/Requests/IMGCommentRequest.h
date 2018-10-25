@@ -49,7 +49,7 @@
  Delete comment. Must be logged in.
  @param commentId comment id to delete
  */
-+ (void)deleteCommentWithID:(NSInteger)commentID success:(void (^)())success failure:(void (^)(NSError *error))failure;
++ (void)deleteCommentWithID:(NSInteger)commentID success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
 
 #pragma mark - Vote
 /**
@@ -57,13 +57,13 @@
  @param commentId comment id to vote on
  @param vote vote to give comment
  */
-+ (void)voteCommentWithID:(NSInteger)commentID withVote:(IMGVoteType)vote success:(void (^)())success failure:(void (^)(NSError *error))failure;
++ (void)voteCommentWithID:(NSInteger)commentID withVote:(IMGVoteType)vote success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
 
 #pragma mark - Report
 /**
  Report a comment as inappropiate. Must be logged in.
  @param commentId comment id to report
  */
-+ (void)reportCommentWithID:(NSInteger)commentID success:(void (^)())success failure:(void (^)(NSError *error))failure;
++ (void)reportCommentWithID:(NSInteger)commentID success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
 
 @end

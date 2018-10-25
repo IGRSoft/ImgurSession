@@ -30,7 +30,7 @@
 /**
  Create a new message. Must be logged in.
  */
-+ (void)createMessageWithRecipient:(NSString*)recipient withBody:(NSString*)body success:(void (^)())success failure:(void (^)(NSError *error))failure;
++ (void)createMessageWithRecipient:(NSString*)recipient withBody:(NSString*)body success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
 
 
 #pragma mark - Delete
@@ -38,17 +38,17 @@
  Delete a conversation. Must be logged in.
  @param commentId comment id to delete
  */
-+ (void)deleteConversation:(NSInteger)convoID success:(void (^)())success failure:(void (^)(NSError *error))failure;
++ (void)deleteConversation:(NSInteger)convoID success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
 
 #pragma mark - Report
 /**
  Report a user for sending messages that are against the Terms of Service. Must be logged in.
  */
-+ (void)reportSender:(NSString*)username success:(void (^)())success failure:(void (^)(NSError *error))failure;
++ (void)reportSender:(NSString*)username success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
 
 #pragma mark - Block
 /**
  Report a user for sending messages that are against the Terms of Service. Must be logged in.
  */
-+ (void)blockSender:(NSString*)username success:(void (^)())success failure:(void (^)(NSError *error))failure;
++ (void)blockSender:(NSString*)username success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
 @end

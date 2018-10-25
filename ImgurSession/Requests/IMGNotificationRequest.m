@@ -108,7 +108,7 @@
 
 #pragma mark - Delete
 
-+ (void)notificationViewed:(NSString *)notificationId success:(void (^)())success failure:(void (^)(NSError *))failure{
++ (void)notificationViewed:(NSString *)notificationId success:(void (^)(void))success failure:(void (^)(NSError *))failure{
     NSString *path = [self pathWithID:notificationId];
     
     if([[IMGSession sharedInstance] isAnonymous]){
@@ -121,7 +121,7 @@
     [[IMGSession sharedInstance] DELETE:path parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
         
         if(success)
-            success(nil);
+            success();
         
     } failure:failure];
 }

@@ -326,7 +326,7 @@
 
 #pragma mark - Delete
 
-+ (void)deleteImageWithID:(NSString *)imageID success:(void (^)())success failure:(void (^)(NSError *))failure{
++ (void)deleteImageWithID:(NSString *)imageID success:(void (^)(void))success failure:(void (^)(NSError *))failure{
     NSString *path = [self pathWithID:imageID];
     
     if([[IMGSession sharedInstance] isAnonymous]){
@@ -338,7 +338,7 @@
     [self deleteImageWithHash:imageID success:success failure:failure];
 }
 
-+ (void)deleteImageWithHash:(NSString *)deletehash success:(void (^)())success failure:(void (^)(NSError *))failure{
++ (void)deleteImageWithHash:(NSString *)deletehash success:(void (^)(void))success failure:(void (^)(NSError *))failure{
     NSString *path = [self pathWithID:deletehash];
     
     [[IMGSession sharedInstance] DELETE:path parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
@@ -351,7 +351,7 @@
 
 #pragma mark - Favourite
 
-+(void)favouriteImageWithID:(NSString*)imageID  success:(void (^)())success failure:(void (^)(NSError *error))failure{
++(void)favouriteImageWithID:(NSString*)imageID  success:(void (^)(void))success failure:(void (^)(NSError *error))failure{
     NSString *path = [self pathWithID:imageID withOption:@"favorite"];
     
     if([[IMGSession sharedInstance] isAnonymous]){
@@ -369,7 +369,7 @@
 
 #pragma mark - Update
 
-+ (void)updateImageWithID:(NSString *)imageID title:(NSString*)title description:(NSString*)description success:(void (^)())success failure:(void (^)(NSError *))failure{
++ (void)updateImageWithID:(NSString *)imageID title:(NSString*)title description:(NSString*)description success:(void (^)(void))success failure:(void (^)(NSError *))failure{
     NSString *path = [self pathWithID:imageID];
     
     if([[IMGSession sharedInstance] isAnonymous]){
@@ -381,7 +381,7 @@
     [self updateImageWithDeleteHash:imageID title:title description:description success:success failure:failure];
 }
 
-+ (void)updateImageWithDeleteHash:(NSString *)deletehash title:(NSString*)title description:(NSString*)description success:(void (^)())success failure:(void (^)(NSError *))failure{
++ (void)updateImageWithDeleteHash:(NSString *)deletehash title:(NSString*)title description:(NSString*)description success:(void (^)(void))success failure:(void (^)(NSError *))failure{
     NSString *path = [self pathWithID:deletehash];
 
     NSMutableDictionary *parameters = [NSMutableDictionary new];

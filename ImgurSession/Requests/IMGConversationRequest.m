@@ -79,7 +79,7 @@
 #pragma mark - Create
 
 
-+ (void)createMessageWithRecipient:(NSString*)recipient withBody:(NSString*)body success:(void (^)())success failure:(void (^)(NSError *))failure{
++ (void)createMessageWithRecipient:(NSString*)recipient withBody:(NSString*)body success:(void (^)(void))success failure:(void (^)(NSError *))failure{
     NSString *path = [self pathWithID:recipient];
     NSDictionary * params = @{@"recipient":recipient,@"body":body};
     
@@ -99,7 +99,7 @@
 
 #pragma mark - Delete
 
-+ (void)deleteConversation:(NSInteger)convoID success:(void (^)())success failure:(void (^)(NSError *))failure{
++ (void)deleteConversation:(NSInteger)convoID success:(void (^)(void))success failure:(void (^)(NSError *))failure{
     NSString *path = [self pathWithID:[NSString stringWithFormat:@"%lu", (long)convoID]];
     
     if([[IMGSession sharedInstance] isAnonymous]){
@@ -118,7 +118,7 @@
 
 #pragma mark - Report
 
-+ (void)reportSender:(NSString*)username success:(void (^)())success failure:(void (^)(NSError *))failure{
++ (void)reportSender:(NSString*)username success:(void (^)(void))success failure:(void (^)(NSError *))failure{
     NSString *path = [self pathWithOption:@"report" withID2:username];
     
     if([[IMGSession sharedInstance] isAnonymous]){
@@ -137,7 +137,7 @@
 
 #pragma mark - Block
 
-+ (void)blockSender:(NSString*)username success:(void (^)())success failure:(void (^)(NSError *))failure{
++ (void)blockSender:(NSString*)username success:(void (^)(void))success failure:(void (^)(NSError *))failure{
     NSString *path = [self pathWithOption:@"block" withID2:username];
     
     if([[IMGSession sharedInstance] isAnonymous]){

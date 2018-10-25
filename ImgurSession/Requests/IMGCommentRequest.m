@@ -117,7 +117,7 @@
 
 #pragma mark - Delete
 
-+ (void)deleteCommentWithID:(NSInteger)commentID success:(void (^)())success failure:(void (^)(NSError *))failure{
++ (void)deleteCommentWithID:(NSInteger)commentID success:(void (^)(void))success failure:(void (^)(NSError *))failure{
     NSString *path = [self pathWithID:[NSString stringWithFormat:@"%lu", (unsigned long)commentID]];
     
     if([[IMGSession sharedInstance] isAnonymous]){
@@ -135,7 +135,7 @@
 
 #pragma mark - Vote
 
-+ (void)voteCommentWithID:(NSInteger)commentID withVote:(IMGVoteType)vote success:(void (^)())success failure:(void (^)(NSError *))failure{
++ (void)voteCommentWithID:(NSInteger)commentID withVote:(IMGVoteType)vote success:(void (^)(void))success failure:(void (^)(NSError *))failure{
     NSString *path = [self pathWithID:[NSString stringWithFormat:@"%lu", (unsigned long)commentID] withOption:@"vote" withID2:[IMGVote strForVote:vote]];
     
     if([[IMGSession sharedInstance] isAnonymous]){
@@ -155,7 +155,7 @@
 
 #pragma mark - Report
 
-+ (void)reportCommentWithID:(NSInteger)commentID success:(void (^)())success failure:(void (^)(NSError *))failure{
++ (void)reportCommentWithID:(NSInteger)commentID success:(void (^)(void))success failure:(void (^)(NSError *))failure{
     NSString *path = [self pathWithID:[NSString stringWithFormat:@"%lu", (unsigned long)commentID] withOption:@"vote/report"];
     
     if([[IMGSession sharedInstance] isAnonymous]){

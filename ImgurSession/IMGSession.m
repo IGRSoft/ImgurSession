@@ -333,7 +333,7 @@ static BOOL useMashape = NO;
     }];
 }
 
--(void)postForAccessTokens:(void (^)())success failure:(void (^)(NSError *error))failure{
+-(void)postForAccessTokens:(void (^)(void))success failure:(void (^)(NSError *error))failure{
     
     NSDictionary * refreshParams = @{@"refresh_token":_refreshToken, @"client_id":_clientID, @"client_secret":_secret, @"grant_type":@"refresh_token"};
     

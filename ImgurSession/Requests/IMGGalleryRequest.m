@@ -245,11 +245,11 @@
 
 #pragma mark - Submit Gallery Objects
 
-+ (void)submitImageWithID:(NSString *)imageID title:(NSString *)title success:(void (^)())success failure:(void (^)(NSError *))failure{
++ (void)submitImageWithID:(NSString *)imageID title:(NSString *)title success:(void (^)(void))success failure:(void (^)(NSError *))failure{
     return [self submitImageWithID:imageID title:title terms:YES success:success failure:failure];
 }
 
-+ (void)submitImageWithID:(NSString *)imageID title:(NSString *)title terms:(BOOL)terms success:(void (^)())success failure:(void (^)(NSError *))failure{
++ (void)submitImageWithID:(NSString *)imageID title:(NSString *)title terms:(BOOL)terms success:(void (^)(void))success failure:(void (^)(NSError *))failure{
     NSString *path = [self pathWithOption:@"image" withID2:imageID];
     
     if([[IMGSession sharedInstance] isAnonymous]){
@@ -286,11 +286,11 @@
     }];
 }
 
-+ (void)submitAlbumWithID:(NSString *)albumID title:(NSString *)title success:(void (^)())success failure:(void (^)(NSError *))failure{
++ (void)submitAlbumWithID:(NSString *)albumID title:(NSString *)title success:(void (^)(void))success failure:(void (^)(NSError *))failure{
     return [self submitAlbumWithID:albumID title:title terms:YES success:success failure:failure];
 }
 
-+ (void)submitAlbumWithID:(NSString *)albumID title:(NSString *)title terms:(BOOL)terms success:(void (^)())success failure:(void (^)(NSError *))failure{
++ (void)submitAlbumWithID:(NSString *)albumID title:(NSString *)title terms:(BOOL)terms success:(void (^)(void))success failure:(void (^)(NSError *))failure{
     NSString *path = [self pathWithOption:@"album" withID2:albumID];
     
     if([[IMGSession sharedInstance] isAnonymous]){
@@ -328,7 +328,7 @@
 
 #pragma mark - Remove Gallery objects
 
-+ (void)removeImageWithID:(NSString *)imageID success:(void (^)())success failure:(void (^)(NSError *))failure{
++ (void)removeImageWithID:(NSString *)imageID success:(void (^)(void))success failure:(void (^)(NSError *))failure{
     NSString *path = [self pathWithID:imageID];
     
     if([[IMGSession sharedInstance] isAnonymous]){
@@ -345,7 +345,7 @@
     } failure:failure];
 }
 
-+ (void)removeAlbumWithID:(NSString *)albumID success:(void (^)())success failure:(void (^)(NSError *))failure{
++ (void)removeAlbumWithID:(NSString *)albumID success:(void (^)(void))success failure:(void (^)(NSError *))failure{
     NSString *path = [self pathWithID:albumID];
     
     if([[IMGSession sharedInstance] isAnonymous]){
@@ -363,7 +363,7 @@
 
 #pragma mark - Voting/Reporting
 
-+ (void)reportWithID:(NSString *)galleryObjectID success:(void (^)())success failure:(void (^)(NSError *error))failure{
++ (void)reportWithID:(NSString *)galleryObjectID success:(void (^)(void))success failure:(void (^)(NSError *error))failure{
     NSString *path = [self pathWithID:galleryObjectID withOption:@"report"];
     
     [[IMGSession sharedInstance] POST:path parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
@@ -373,7 +373,7 @@
     } failure:failure];
 }
 
-+ (void)voteWithID:(NSString *)galleryObjectID withVote:(IMGVoteType)vote success:(void (^)())success failure:(void (^)(NSError *error))failure{
++ (void)voteWithID:(NSString *)galleryObjectID withVote:(IMGVoteType)vote success:(void (^)(void))success failure:(void (^)(NSError *error))failure{
     NSString *path = [self pathWithID:galleryObjectID withOption:@"vote" withID2:[IMGVote strForVote:vote]];
     
     if([[IMGSession sharedInstance] isAnonymous]){
@@ -523,7 +523,7 @@
     [self submitComment:caption galleryID:galleryObjectID parentComment:parentCommentID success:success failure:failure];
 }
 
-+ (void)deleteCommentWithID:(NSInteger)commentID success:(void (^)())success failure:(void (^)(NSError *))failure{
++ (void)deleteCommentWithID:(NSInteger)commentID success:(void (^)(void))success failure:(void (^)(NSError *))failure{
     NSString *path = [self pathWithID:[NSString stringWithFormat:@"%lu", (unsigned long)commentID]];
     
     if([[IMGSession sharedInstance] isAnonymous]){

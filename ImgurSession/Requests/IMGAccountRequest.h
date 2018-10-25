@@ -48,7 +48,7 @@
 /**
  Sends the verification email to user
  */
-+(void)sendUserEmailVerification:(void (^)())success failure:(void (^)(NSError * error))failure;
++(void)sendUserEmailVerification:(void (^)(void))success failure:(void (^)(NSError * error))failure;
 /**
  Determines whether the user has verified their email
  */
@@ -73,11 +73,11 @@
 /**
  Update current account settings with new values. Must be logged in.
  */
-+ (void)changeAccountWithBio:(NSString*)bio success:(void (^)())success failure:(void (^)(NSError *error))failure;
++ (void)changeAccountWithBio:(NSString*)bio success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
 /**
  Update current account settings with new values. Must be logged in.
  */
-+ (void)changeAccountWithBio:(NSString*)bio messagingEnabled:(BOOL)msgEnabled publicImages:(BOOL)publicImages albumPrivacy:(IMGAlbumPrivacy)privacy acceptedGalleryTerms:(BOOL)galTerms success:(void (^)())success failure:(void (^)(NSError *error))failure;
++ (void)changeAccountWithBio:(NSString*)bio messagingEnabled:(BOOL)msgEnabled publicImages:(BOOL)publicImages albumPrivacy:(IMGAlbumPrivacy)privacy acceptedGalleryTerms:(BOOL)galTerms success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
 
 
 #pragma mark - Albums associated with account
@@ -101,7 +101,7 @@
 /**
  Delete an Album with a given id.  Must be logged in.
  */
-+ (void)accountDeleteAlbumWithID:(NSString*)albumID success:(void (^)())success failure:(void (^)(NSError * error))failure;
++ (void)accountDeleteAlbumWithID:(NSString*)albumID success:(void (^)(void))success failure:(void (^)(NSError * error))failure;
 
 
 
@@ -126,7 +126,7 @@
 /**
  Deletes an Image. This requires a delete hash rather than an ID.
  */
-+ (void)accountDeleteImageWithUser:(NSString*)username deletehash:(NSString*)deleteHash success:(void (^)())success failure:(void (^)(NSError * error))failure;
++ (void)accountDeleteImageWithUser:(NSString*)username deletehash:(NSString*)deleteHash success:(void (^)(void))success failure:(void (^)(NSError * error))failure;
 
 
 #pragma mark - Comments associated with account
@@ -150,7 +150,7 @@
 /**
  Delete a comment from the current account. Must be logged in.
  */
-+ (void)accountDeleteCommentWithID:(NSInteger)commentID success:(void (^)())success failure:(void (^)(NSError * error))failure;
++ (void)accountDeleteCommentWithID:(NSInteger)commentID success:(void (^)(void))success failure:(void (^)(NSError * error))failure;
 
 
 #pragma mark - Replies associated with account

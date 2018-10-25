@@ -91,12 +91,12 @@
 
 #pragma mark - Update
 
-+ (void)updateAlbumWithID:(NSString*)albumID imageIDs:(NSArray *)imageIDs success:(void (^)())success failure:(void (^)(NSError *))failure{
++ (void)updateAlbumWithID:(NSString*)albumID imageIDs:(NSArray *)imageIDs success:(void (^)(void))success failure:(void (^)(NSError *))failure{
     
     [self updateAlbumWithID:albumID title:nil description:nil imageIDs:imageIDs privacy:0 layout:0 cover:nil success:success failure:failure];
 }
 
-+ (void)updateAlbumWithID:(NSString*)albumID title:(NSString *)title description:(NSString *)description imageIDs:(NSArray *)imageIDs privacy:(IMGAlbumPrivacy)privacy layout:(IMGAlbumLayout)layout cover:(NSString *)coverID success:(void (^)())success failure:(void (^)(NSError *))failure{
++ (void)updateAlbumWithID:(NSString*)albumID title:(NSString *)title description:(NSString *)description imageIDs:(NSArray *)imageIDs privacy:(IMGAlbumPrivacy)privacy layout:(IMGAlbumLayout)layout cover:(NSString *)coverID success:(void (^)(void))success failure:(void (^)(NSError *))failure{
     
     //path is different from create album just with the ID
     NSString * path = [self pathWithID:albumID];
@@ -157,7 +157,7 @@
 
 #pragma mark - Delete
 
-+ (void)deleteAlbumWithID:(NSString *)albumID success:(void (^)())success failure:(void (^)(NSError *))failure{
++ (void)deleteAlbumWithID:(NSString *)albumID success:(void (^)(void))success failure:(void (^)(NSError *))failure{
     NSString *path = [self pathWithID:albumID];
     
     if([[IMGSession sharedInstance] isAnonymous]){
@@ -169,7 +169,7 @@
     [self deleteAlbumWithDeleteHash:albumID success:success failure:failure];
 }
 
-+ (void)deleteAlbumWithDeleteHash:(NSString *)deletehash success:(void (^)())success failure:(void (^)(NSError *error))failure{
++ (void)deleteAlbumWithDeleteHash:(NSString *)deletehash success:(void (^)(void))success failure:(void (^)(NSError *error))failure{
     NSString *path = [self pathWithID:deletehash];
     
     [[IMGSession sharedInstance] DELETE:path parameters:Nil success:^(NSURLSessionDataTask *task, id responseObject) {
@@ -181,7 +181,7 @@
 
 #pragma mark - Favourite
 
-+(void)favouriteAlbumWithID:(NSString*)albumID  success:(void (^)())success failure:(void (^)(NSError *error))failure{
++(void)favouriteAlbumWithID:(NSString*)albumID  success:(void (^)(void))success failure:(void (^)(NSError *error))failure{
     NSString *path = [self pathWithID:albumID withOption:@"favorite"];
     
     if([[IMGSession sharedInstance] isAnonymous]){

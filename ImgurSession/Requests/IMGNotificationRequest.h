@@ -36,7 +36,7 @@
 /**
  Marks a notification as viewed, this way it no longer shows up in the basic notification request. Must be logged in.
  */
-+ (void)notificationViewed:(NSString *)notificationId success:(void (^)())success failure:(void (^)(NSError * error))failure;
++ (void)notificationViewed:(NSString *)notificationId success:(void (^)(void))success failure:(void (^)(NSError * error))failure;
 
 
 @end

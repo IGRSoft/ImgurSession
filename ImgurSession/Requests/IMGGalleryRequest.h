@@ -105,15 +105,15 @@ typedef NS_ENUM(NSInteger, IMGGalleryCommentSortType) {
  @param imageId    imageId to submit to gallery
  @param title    title to append to top of imgur page
  */
-+ (void)submitImageWithID:(NSString *)imageID title:(NSString *)title success:(void (^)())success failure:(void (^)(NSError *error))failure;
-+ (void)submitImageWithID:(NSString *)imageID title:(NSString *)title terms:(BOOL)terms success:(void (^)())success failure:(void (^)(NSError *error))failure;
++ (void)submitImageWithID:(NSString *)imageID title:(NSString *)title success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
++ (void)submitImageWithID:(NSString *)imageID title:(NSString *)title terms:(BOOL)terms success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
 /**
  Submits gallery album with id. Must be logged in.
  @param albumID    albumID to submit to gallery
  @param title    title to append to top of imgur page
  */
-+ (void)submitAlbumWithID:(NSString *)albumID title:(NSString *)title success:(void (^)())success failure:(void (^)(NSError *error))failure;
-+ (void)submitAlbumWithID:(NSString *)albumID title:(NSString *)title terms:(BOOL)terms success:(void (^)())success failure:(void (^)(NSError *error))failure;
++ (void)submitAlbumWithID:(NSString *)albumID title:(NSString *)title success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
++ (void)submitAlbumWithID:(NSString *)albumID title:(NSString *)title terms:(BOOL)terms success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
 
 #pragma mark - Remove Gallery objects
 
@@ -121,12 +121,12 @@ typedef NS_ENUM(NSInteger, IMGGalleryCommentSortType) {
  Removes gallery image from gallery. Must be logged in.
  @param imageID    imageID to remove from gallery
  */
-+ (void)removeImageWithID:(NSString *)imageID success:(void (^)())success failure:(void (^)(NSError *error))failure;
++ (void)removeImageWithID:(NSString *)imageID success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
 /**
  Removes gallery album from gallery. Must be logged in.
  @param albumID    albumID to remove from gallery
  */
-+ (void)removeAlbumWithID:(NSString *)albumID success:(void (^)())success failure:(void (^)(NSError *error))failure;
++ (void)removeAlbumWithID:(NSString *)albumID success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
 
 
 #pragma mark - Voting/Reporting
@@ -135,12 +135,12 @@ typedef NS_ENUM(NSInteger, IMGGalleryCommentSortType) {
  Report gallery object ID as being offensive
  @param galleryObjectId    gallery object id string to report
  */
-+ (void)reportWithID:(NSString *)galleryObjectID success:(void (^)())success failure:(void (^)(NSError *error))failure;
++ (void)reportWithID:(NSString *)galleryObjectID success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
 /**
  Vote on gallery object ID. Must be logged in.
  @param vote    vote type for user to vote on gallery object
  */
-+ (void)voteWithID:(NSString *)galleryObjectID withVote:(IMGVoteType)vote success:(void (^)())success failure:(void (^)(NSError *error))failure;
++ (void)voteWithID:(NSString *)galleryObjectID withVote:(IMGVoteType)vote success:(void (^)(void))success failure:(void (^)(NSError *error))failure;
 /**
  Retrieve voting results for a gallery object
  */
@@ -183,7 +183,7 @@ typedef NS_ENUM(NSInteger, IMGGalleryCommentSortType) {
  Delete a posted comment with an ID. Must be logged in.
  @param commentId    comment ID to get
  */
-+ (void)deleteCommentWithID:(NSInteger)commentID success:(void (^)())success failure:(void (^)(NSError * error))failure;
++ (void)deleteCommentWithID:(NSInteger)commentID success:(void (^)(void))success failure:(void (^)(NSError * error))failure;
 /**
  Retrieves count of comments from gallery object
  @param galleryObjectId    ID string of gallery object to retrieve comment count from
