@@ -1,10 +1,10 @@
 Pod::Spec.new do |spec|
   spec.name             = 'ImgurSession'
-  spec.version          = '1.3,1'
+  spec.version          = '1.3'
   spec.license          = {:type => 'MIT'}
   spec.homepage         = 'https://github.com/geoffmacd/ImgurSession'
   spec.summary          = 'Imgur API for Objective C'
-  spec.source           =  {:git => 'https://github.com/geoffmacd/ImgurSession.git', :tag => '1.3.1'}
+  spec.source           =  {:git => 'https://github.com/geoffmacd/ImgurSession.git', :tag => '1.3'}
   spec.source_files     = 'ImgurSession/**/*.{h,m}'
   spec.author              = { "Geoff MacDonald" => "geoffmacd@gmail.com" }
   spec.framework        = 'Foundation'
