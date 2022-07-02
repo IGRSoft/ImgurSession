@@ -1,4 +1,4 @@
-    //
+//
 //  IMGClient.m
 //  ImgurSession
 //
@@ -59,7 +59,7 @@
 static BOOL useMashape = NO;
 
 +(instancetype)authenticatedSessionWithClientID:(NSString *)clientID secret:(NSString *)secret authType:(IMGAuthType)authType withDelegate:(id<IMGSessionDelegate>)delegate{
-
+    
     return [self authenticatedSessionWithClientID:clientID secret:secret mashapeKey:nil authType:authType withDelegate:delegate];
 }
 
@@ -246,10 +246,10 @@ static BOOL useMashape = NO;
  Inform the delegate of changes in authentication state of the session as they happen. Delegate can also call sessionAuthState.
  */
 -(void)informClientAuthStateChanged:(IMGAuthState)authState{
-    
+    __weak typeof(self) weak = self;
     dispatch_async(dispatch_get_main_queue(), ^{
-        if(_delegate && [_delegate respondsToSelector:@selector(imgurSessionAuthStateChanged:)])
-            [_delegate imgurSessionAuthStateChanged:authState];
+        if(weak.delegate && [weak.delegate respondsToSelector:@selector(imgurSessionAuthStateChanged:)])
+            [weak.delegate imgurSessionAuthStateChanged:authState];
         
         [[NSNotificationCenter defaultCenter] postNotificationName:IMGAuthChangedNotification object:[NSNumber numberWithInt:authState]];
     });
@@ -261,7 +261,7 @@ static BOOL useMashape = NO;
 }
 
 -(void)authenticate:(void (^)(NSString * refreshToken))success failure:(void (^)(NSError *error))failure{
-
+    
     [self refreshAuthentication:^(NSString *refreshToken) {
         
         if(success)
@@ -299,34 +299,33 @@ static BOOL useMashape = NO;
     //call oauth/token with auth type
     NSDictionary * params = @{[IMGSession strForAuthType:self.authType]:inputCode, @"client_id":_clientID, @"client_secret":_secret, @"grant_type":grantTypeStr};
     
+    __weak typeof(self) weak = self;
     //use super to bypass authentication checks
-    [self.authSession POST:IMGOAuthEndpoint parameters:params progress:nil success:^(NSURLSessionDataTask *task, id responseObject) {
-        
+    [self.authSession POST:IMGOAuthEndpoint parameters:params headers:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         //alert delegate
-        [self informClientAuthStateChanged:IMGAuthStateAuthenticated];
+        [weak informClientAuthStateChanged:IMGAuthStateAuthenticated];
         
         NSDictionary * json = responseObject;
         //set auth header
-        [self setAuthorizationHeader:json];
+        [weak setAuthorizationHeader:json];
         //retrieve user account
-        [self refreshUserAccount];
+        [weak refreshUserAccount];
         
-        if(success)
-            success(self.refreshToken);
+        if(success) {
+            success(weak.refreshToken);
+        }
         
         //alert after resuming
         dispatch_async(dispatch_get_main_queue(), ^{
             
-            if(_delegate && [_delegate respondsToSelector:@selector(imgurSessionTokenRefreshed)])
-                [_delegate imgurSessionTokenRefreshed];
+            if(weak.delegate && [weak.delegate respondsToSelector:@selector(imgurSessionTokenRefreshed)])
+                [weak.delegate imgurSessionTokenRefreshed];
             
             [[NSNotificationCenter defaultCenter] postNotificationName:IMGAuthRefreshedNotification object:nil];
         });
-        
-    } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        
+    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
         //alert delegate
-        [self informClientAuthStateChanged:IMGAuthStateBad];
+        [weak informClientAuthStateChanged:IMGAuthStateBad];
         
         if(failure)
             failure([NSError errorWithDomain:IMGErrorDomain code:IMGErrorCouldNotAuthenticate userInfo:@{IMGErrorAuthenticationError:error}]);
@@ -335,25 +334,27 @@ static BOOL useMashape = NO;
 
 -(void)postForAccessTokens:(void (^)(void))success failure:(void (^)(NSError *error))failure{
     
-    NSDictionary * refreshParams = @{@"refresh_token":_refreshToken, @"client_id":_clientID, @"client_secret":_secret, @"grant_type":@"refresh_token"};
+    NSDictionary * params = @{@"refresh_token":_refreshToken, @"client_id":_clientID, @"client_secret":_secret, @"grant_type":@"refresh_token"};
+    __weak typeof(self) weak = self;
     
     //use super to bypass authentication checks
-    [self.authSession POST:IMGOAuthEndpoint parameters:refreshParams progress:nil success:^(NSURLSessionDataTask *task, id responseObject) {
+    [self.authSession POST:IMGOAuthEndpoint parameters:params headers:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         
         NSDictionary * json = responseObject;
         //set auth header
-        [self setAuthorizationHeader:json];
+        [weak setAuthorizationHeader:json];
         //immediately request latest user updates
-        [self refreshUserAccount];
+        [weak refreshUserAccount];
         
-        if(success)
+        if(success) {
             success();
+        }
         
         //alert after resuming
         dispatch_async(dispatch_get_main_queue(), ^{
             
-            if(_delegate && [_delegate respondsToSelector:@selector(imgurSessionTokenRefreshed)])
-                [_delegate imgurSessionTokenRefreshed];
+            if(weak.delegate && [weak.delegate respondsToSelector:@selector(imgurSessionTokenRefreshed)])
+                [weak.delegate imgurSessionTokenRefreshed];
             
             [[NSNotificationCenter defaultCenter] postNotificationName:IMGAuthRefreshedNotification object:nil];
         });
@@ -366,13 +367,13 @@ static BOOL useMashape = NO;
         if(error.code >= IMGErrorInvalidRefreshToken && error.code < 500){
             
             //set to nil to ensure we acquire new refresh token
-            self.refreshToken = nil;
+            weak.refreshToken = nil;
             
             if(failure)
                 failure(error);
         }
     }];
-
+    
 }
 
 /**
@@ -389,41 +390,41 @@ static BOOL useMashape = NO;
         refreshQueue = dispatch_queue_create("RefreshQueue",DISPATCH_QUEUE_SERIAL);
     });
     
+    __weak typeof(self) weak = self;
     //keep track of multiple file uploads with semaphore
     static dispatch_once_t semaToken;
     dispatch_once(&semaToken, ^{
-        self.refreshSemaphore  = dispatch_semaphore_create(0);
+        weak.refreshSemaphore  = dispatch_semaphore_create(0);
     });
     
     //save date to be copied to block so that if this call was awaiting a current failed request to finish, it will be able to tell if refresh has since happened
     NSDate * requestRefreshDate = [NSDate date];
-    
     dispatch_async(refreshQueue, ^{
         
-        IMGAuthState state = [self sessionAuthState];
+        IMGAuthState state = [weak sessionAuthState];
         
         if(state == IMGAuthStateExpired){
             //refresh access token with refresh token
             
-            [self postForAccessTokens:^{
-                 
+            [weak postForAccessTokens:^{
+                
                 //resume
-                dispatch_semaphore_signal(self.refreshSemaphore);
+                dispatch_semaphore_signal(weak.refreshSemaphore);
                 
                 if(success)
-                    success(self.refreshToken);
+                    success(weak.refreshToken);
                 
             } failure:^(NSError *error) {
                 
                 //resume to allow possible refreshes
-                dispatch_semaphore_signal(self.refreshSemaphore);
+                dispatch_semaphore_signal(weak.refreshSemaphore);
                 
                 //need to ask user for a new code input
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [_delegate imgurSessionNeedsExternalWebview:[self authenticateWithExternalURL] completion:^{
+                    [weak.delegate imgurSessionNeedsExternalWebview:[weak authenticateWithExternalURL] completion:^{
                         
                         //post code and retrieve new tokens
-                        [self refreshAuthentication:^(NSString * refresh) {
+                        [weak refreshAuthentication:^(NSString * refresh) {
                             
                             if(success)
                                 success(refresh);
@@ -440,10 +441,11 @@ static BOOL useMashape = NO;
         } else if(state == IMGAuthStateAwaitingCodeInput){
             //retrieve refresh tokens with input code
             
+            __weak typeof(self) weak = self;
             [self postForRefreshTokensWithCode:self.codeAwaitingAuthentication success:^(NSString *refreshToken) {
                 
                 //resume
-                dispatch_semaphore_signal(self.refreshSemaphore);
+                dispatch_semaphore_signal(weak.refreshSemaphore);
                 
                 if(success)
                     success(refreshToken);
@@ -451,7 +453,7 @@ static BOOL useMashape = NO;
             } failure:^(NSError *error) {
                 
                 //resume to allow possible refreshes
-                dispatch_semaphore_signal(self.refreshSemaphore);
+                dispatch_semaphore_signal(weak.refreshSemaphore);
                 
                 if(failure)
                     failure(error);
@@ -462,21 +464,22 @@ static BOOL useMashape = NO;
             
             //wait for signal from post request before accepting new requests
             dispatch_semaphore_wait(self.refreshSemaphore, DISPATCH_TIME_FOREVER);
-        
+            
         } else {
             
             //do not await this logic
             
             if(state == IMGAuthStateNone){
                 //we need to retrieve refresh token with client credentials first
+                __weak typeof(self) weak = self;
                 
                 //alert app that it needs to present webview or go to safari
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    if(_delegate && [_delegate respondsToSelector:@selector(imgurSessionNeedsExternalWebview:completion:)])
-                        [_delegate imgurSessionNeedsExternalWebview:[self authenticateWithExternalURL] completion:^{
+                    if(weak.delegate && [weak.delegate respondsToSelector:@selector(imgurSessionNeedsExternalWebview:completion:)])
+                        [weak.delegate imgurSessionNeedsExternalWebview:[weak authenticateWithExternalURL] completion:^{
                             
                             //refresh upon recieving new auth code
-                            [self refreshAuthentication:^(NSString * refresh) {
+                            [weak refreshAuthentication:^(NSString * refresh) {
                                 
                                 if(success)
                                     success(refresh);
@@ -494,7 +497,7 @@ static BOOL useMashape = NO;
                 //we need to compare expiry date of access token to decide whether to refresh or simply redo the request
                 if([self.accessTokenExpiry timeIntervalSinceReferenceDate] - 3600 > [requestRefreshDate timeIntervalSinceReferenceDate]){
                     //new access token has been retrieved since we failed
-
+                    
                     if(success)
                         success(nil);
                 } else {
@@ -573,12 +576,12 @@ static BOOL useMashape = NO;
         
         //set need user
         self.user = account;
-        
+        __weak typeof(self) weak = self;
         dispatch_async(dispatch_get_main_queue(), ^{
             
             //only if delegate responds do we inform
-            if(_delegate && [_delegate respondsToSelector:@selector(imgurSessionUserRefreshed:)]){
-                [_delegate imgurSessionUserRefreshed:account];
+            if(weak.delegate && [weak.delegate respondsToSelector:@selector(imgurSessionUserRefreshed:)]){
+                [weak.delegate imgurSessionUserRefreshed:account];
             }
             [[NSNotificationCenter defaultCenter] postNotificationName:IMGRefreshedUserNotification object:account];
         });
@@ -599,11 +602,11 @@ static BOOL useMashape = NO;
     
     //only if delegate responds do we check
     if(_delegate && [_delegate respondsToSelector:@selector(imgurSessionNewNotifications:)] && [self sessionAuthState] == IMGAuthStateAuthenticated){
-        
+        __weak typeof(self) weak = self;
         [IMGNotificationRequest unreadNotifications:^(NSArray * fresh) {
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                [_delegate imgurSessionNewNotifications:fresh];
+                [weak.delegate imgurSessionNewNotifications:fresh];
                 
                 [[NSNotificationCenter defaultCenter] postNotificationName:IMGRefreshedNotificationsNotification object:fresh];
             });
@@ -729,22 +732,22 @@ static BOOL useMashape = NO;
     if(headers[IMGHeaderUserRemaining]){
         //warn delegate if necessary
         if(_creditsUserRemaining < _warnRateLimit && _creditsUserRemaining > 0){
-            
+            __weak typeof(self) weak = self;
             dispatch_async(dispatch_get_main_queue(), ^{
-            
-                if(_delegate && [_delegate respondsToSelector:@selector(imgurSessionNearRateLimit:) ]){
-                    [_delegate imgurSessionNearRateLimit:_creditsUserRemaining];
+                
+                if(weak.delegate && [weak.delegate respondsToSelector:@selector(imgurSessionNearRateLimit:) ]){
+                    [weak.delegate imgurSessionNearRateLimit:weak.creditsUserRemaining];
                 }
                 
                 //post notifications as well
                 [[NSNotificationCenter defaultCenter] postNotificationName:IMGRateLimitNearLimitNotification object:nil];
             });
         } else if (_creditsUserRemaining == 0){
-            
+            __weak typeof(self) weak = self;
             dispatch_async(dispatch_get_main_queue(), ^{
-            
-                if(_delegate && [_delegate respondsToSelector:@selector(imgurSessionRateLimitExceeded)]){
-                    [_delegate imgurSessionRateLimitExceeded];
+                
+                if(weak.delegate && [weak.delegate respondsToSelector:@selector(imgurSessionRateLimitExceeded)]){
+                    [weak.delegate imgurSessionRateLimitExceeded];
                 }
                 
                 //post notifications as well
@@ -764,7 +767,7 @@ static BOOL useMashape = NO;
  @param failure block invoked on ability to authenticate
  @return task to be run
  */
--(NSURLSessionDataTask *)methodRequest:(NSURLSessionDataTask * (^)())completion failure:(void (^)( NSError *))failure{
+-(NSURLSessionDataTask *)methodRequest:(NSURLSessionDataTask * (^)(void))completion failure:(void (^)( NSError *))failure{
     
     
     IMGAuthState auth = [self sessionAuthState];
@@ -813,18 +816,18 @@ static BOOL useMashape = NO;
  @return BOOL value YES if the session can re-authenticate
  */
 -(BOOL)canRequestFailureBeRecovered:(NSError*)error{
-
+    
     if(self.isAnonymous){
         //anon, nothing we can do but tell the user
         return NO;
     } else if(error.code == IMGErrorUserRateLimitExceeded){
         //rate limiting error 429 is not recoverable
-        
+        __weak typeof(self) weak = self;
         //warn client
         dispatch_async(dispatch_get_main_queue(), ^{
             
-            if(_delegate && [_delegate respondsToSelector:@selector(imgurSessionRateLimitExceeded)]){
-                [_delegate imgurSessionRateLimitExceeded];
+            if(weak.delegate && [weak.delegate respondsToSelector:@selector(imgurSessionRateLimitExceeded)]){
+                [weak.delegate imgurSessionRateLimitExceeded];
             }
             
             //post notifications as well
@@ -845,15 +848,15 @@ static BOOL useMashape = NO;
  @param failure failure completion blocks to overwrite
  */
 -(void(^)(NSError* error))requestFailure:(void (^)(NSError * error))failure{
-    
+    __weak typeof(self) weak = self;
     void (^modifiedFailure)(NSError* error) = ^void(NSError * error){
         
         //alert of failures
         dispatch_async(dispatch_get_main_queue(), ^{
-           
-            if(_delegate && [_delegate respondsToSelector:@selector(imgurRequestFailed:)]){
+            
+            if(weak.delegate && [weak.delegate respondsToSelector:@selector(imgurRequestFailed:)]){
                 
-                [_delegate imgurRequestFailed:error];
+                [weak.delegate imgurRequestFailed:error];
             }
             [[NSNotificationCenter defaultCenter] postNotificationName:IMGRequestFailedNotification object:self userInfo:@{@"error":error}];
         });
@@ -873,21 +876,18 @@ static BOOL useMashape = NO;
     
     //override failure block to also allow failure tracking
     failure = [self requestFailure:failure];
-    
+    __weak typeof(self) weak = self;
     //proactively check to ensure we can send a request if we are authenticated. If not, then authenticate before sending request
-    return [self methodRequest:^{
-        
-        //actually make the request after ensuring we are authenticated
-        return [super GET:URLString parameters:parameters progress:nil success:success failure:^(NSURLSessionDataTask *task, NSError *error) {
-            
+    return [self methodRequest:^NSURLSessionDataTask *{
+        return [super GET:URLString parameters:parameters headers:nil progress:nil success:success failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
             //if the request fails based on status code, check to see if we can recover by authenticating if for some reason our previous check was not the truth
-            if([self canRequestFailureBeRecovered:error]){
+            if([weak canRequestFailureBeRecovered:error]){
                 
                 //reactive authentication in response to 401 or 403
-                [self refreshAuthentication:^(NSString * accessCode) {
+                [weak refreshAuthentication:^(NSString * accessCode) {
                     
                     //send actual request to super this time and give-up if it still fails
-                    [super GET:URLString parameters:parameters progress:nil success:success failure:^(NSURLSessionDataTask *task, NSError *error) {
+                    [super GET:URLString parameters:parameters headers:nil progress:nil success:success failure:^(NSURLSessionDataTask *task, NSError *error) {
                         
                         failure(error);
                     }];
@@ -898,23 +898,20 @@ static BOOL useMashape = NO;
                 failure(error);
             }
         }];
-        //failure method from not being able to authenticate in refreshAuthentication:
     } failure:failure];
 }
 
 -(NSURLSessionDataTask *)DELETE:(NSString *)URLString parameters:(NSDictionary *)parameters success:(void (^)(NSURLSessionDataTask * task, id responseObject))success failure:(void (^)( NSError * error))failure{
     
     failure = [self requestFailure:failure];
-    
-    return [self methodRequest:^{
-        
-        return [super DELETE:URLString parameters:parameters success:success failure:^(NSURLSessionDataTask *task, NSError *error) {
-            
-            if([self canRequestFailureBeRecovered:error]){
+    __weak typeof(self) weak = self;
+    return [self methodRequest:^NSURLSessionDataTask *{
+        return [super DELETE:URLString parameters:parameters headers:nil success:success failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+            if([weak canRequestFailureBeRecovered:error]){
                 
-                [self refreshAuthentication:^(NSString * accessCode) {
+                [weak refreshAuthentication:^(NSString * accessCode) {
                     
-                    [super DELETE:URLString parameters:parameters success:success failure:^(NSURLSessionDataTask *task, NSError *error){
+                    [super DELETE:URLString parameters:parameters headers:nil success:success failure:^(NSURLSessionDataTask *task, NSError *error){
                         
                         failure(error);
                     }];
@@ -925,24 +922,23 @@ static BOOL useMashape = NO;
                 failure(error);
             }
         }];
-        
     } failure:failure];
 }
 
 -(NSURLSessionDataTask *)POST:(NSString *)URLString parameters:(NSDictionary *)parameters success:(void (^)(NSURLSessionDataTask * task, id responseObject))success failure:(void (^)( NSError * error))failure{
     
     failure = [self requestFailure:failure];
-    
-    return [self methodRequest:^{
+    __weak typeof(self) weak = self;
+    return [self methodRequest:^NSURLSessionDataTask *{
         
-        return [super POST:URLString parameters:parameters progress:nil success:success failure:^(NSURLSessionDataTask *task, NSError *error) {
+        return [super POST:URLString parameters:parameters headers:nil progress:nil success:success failure:^(NSURLSessionDataTask *task, NSError *error) {
             
-            if([self canRequestFailureBeRecovered:error]){
+            if([weak canRequestFailureBeRecovered:error]){
                 
                 
-                [self refreshAuthentication:^(NSString * accessCode) {
+                [weak refreshAuthentication:^(NSString * accessCode) {
                     
-                    [super POST:URLString parameters:parameters progress:nil success:success failure:^(NSURLSessionDataTask *task, NSError *error) {
+                    [super POST:URLString parameters:parameters headers:nil progress:nil success:success failure:^(NSURLSessionDataTask *task, NSError *error) {
                         
                         failure(error);
                     }];
@@ -975,13 +971,13 @@ static BOOL useMashape = NO;
 #pragma mark - Model Tracking
 
 -(void)trackModelObjectsForDelegateHandling:(id)model{
-    
+    __weak typeof(self) weak = self;
     //post notifications as well to class name
     dispatch_async(dispatch_get_main_queue(), ^{
-    
+        
         //tell delegate if necessary
-        if(_delegate && [_delegate respondsToSelector:@selector(imgurSessionModelFetched:)]){
-                [_delegate imgurSessionModelFetched:model];
+        if(weak.delegate && [weak.delegate respondsToSelector:@selector(imgurSessionModelFetched:)]){
+            [weak.delegate imgurSessionModelFetched:model];
         }
         
         [[NSNotificationCenter defaultCenter] postNotificationName:IMGModelFetchedNotification object:model];

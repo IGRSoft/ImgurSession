@@ -237,25 +237,20 @@
         parameters[@"album"] = albumID;
     }
     
-    [[IMGSession sharedInstance] POST:[self path]
-                           parameters:parameters
-            constructingBodyWithBlock:appendFile
-                             progress:progress
-                              success:^(NSURLSessionDataTask *task, id responseObject) {
-                                  
-      NSError *JSONError = nil;
-                                  
-      IMGImage *image = [[IMGImage alloc] initWithJSONObject:responseObject
-                                                       error:&JSONError];
-      if(!JSONError && image && success) {
-          
-          success(image);
-          
-      } else if (failure){
-          
-          failure(nil, JSONError);
-      }
-  } failure:failure];
+    [[IMGSession sharedInstance] POST:[self path] parameters:parameters headers:nil constructingBodyWithBlock:appendFile progress:progress success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+        NSError *JSONError = nil;
+                                    
+        IMGImage *image = [[IMGImage alloc] initWithJSONObject:responseObject
+                                                         error:&JSONError];
+        if(!JSONError && image && success) {
+            
+            success(image);
+            
+        } else if (failure){
+            
+            failure(nil, JSONError);
+        }
+    } failure:failure];
 }
 
 #pragma mark - Upload multiple images
